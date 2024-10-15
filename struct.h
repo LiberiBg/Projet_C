@@ -1,9 +1,9 @@
 #ifndef STRUCT_H
 #define STRUCT_H
 
-struct Word {
-    char* word;
-    int frequency;
+struct Mot {
+    char* mot;
+    int frequence;
 };
 
 #endif
