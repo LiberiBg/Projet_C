@@ -32,11 +32,20 @@ TODO
 Certaines méthodes du projet sont testés via le framework Unity, pour lancer les TU :
 
 1. Spécifier dans `TEST_SRC` les fichiers sources à tester.
-2. Lancer les TU :
+2. Lancer les TU avec make:
     ```sh
     make test
     ```
 
+2. Lancer les TU sans make:
+    ```sh
+    gcc -Iinclude -o test_output tests/*.c src/unity.c src/features.c
+    ```
+3. Exécuter le programme si compilé sans make :
+    ```sh
+    ./output
+    ```
+    
 ## Auteurs
 - [**Mathéo NGUYEN**](https://github.com/LiberiBg)
 - **Alexandre RABOUIN**
