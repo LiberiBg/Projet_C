@@ -64,7 +64,7 @@ void test_incrementer_mot_10_fois(void) {
 
 // Test du redimensionnement
 void test_redimensionnement(void) {
-    nt tailleTableau = TAILLE_TABLEAU_MOTS;
+    int tailleTableau = TAILLE_TABLEAU_MOTS;
     int nombreMots = 0;
     struct Mot* tableauMots = malloc(tailleTableau * sizeof(struct Mot));
 
