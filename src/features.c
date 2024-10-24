@@ -31,3 +31,23 @@ void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMot
     (*tableauMots)[*nombreMots].frequence = 1;
     (*nombreMots)++;
 }
+
+FILE* ouvrirFichierLecture(const char* chemin) {
+    printf("Tentative d'ouverture du fichier : %s\n", chemin);
+    FILE* fichier = fopen(chemin, "r");
+    if (fichier == NULL) {
+        printf("Erreur : Impossible d'ouvrir le fichier %s\n", chemin);
+        perror("Raison");
+        exit(1);
+    }
+    return fichier;
+}
+
+void demanderFichier(char* chemin, int taille) {
+    printf("Entrez le chemin du fichier : ");
+    if (fgets(chemin, taille, stdin) == NULL) {
+        printf("Erreur de lecture du chemin\n");
+        exit(1);
+    }
+    chemin[strcspn(chemin, "\n")] = 0; // Supprime le saut de ligne
+}
