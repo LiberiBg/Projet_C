@@ -1,7 +1,7 @@
 # Projet Scolaire en C
 
 ## Description
-TODO
+Projet FISA S5
 
 ## Structure du Projet
 TODO
