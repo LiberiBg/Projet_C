@@ -7,8 +7,11 @@
 #define TAILLE_INITIALE_TABLEAU 10
 
 int main() {
-    
-     char chemin[256];
+    struct Mot* tableauMots = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
+    int nombreMots = 0;
+    struct Mot tmp[nombreMots];
+    char chemin[256];
+
     demanderFichier(chemin, sizeof(chemin));
 
     FILE* fichier = ouvrirFichierLecture(chemin);
@@ -17,5 +20,9 @@ int main() {
     }
     fclose(fichier);
     printf("Fichier lu avec succès!\n");
+
+    triFusion(0, nombreMots, tableauMots, tableauMots);
+
+    free(tableauMots);
     return 0;
 }

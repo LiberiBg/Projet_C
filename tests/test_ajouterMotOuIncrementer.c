@@ -9,9 +9,6 @@
 
 void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMots, int* tailleTableau);
 
-void setUp(void) {}
-void tearDown(void) {}
-
 // Ajouter un nouveau mot dans une liste vide et l'initialiser à 1
 void test_ajouter_mot_nouveau(void) {
     int tailleTableau = TAILLE_TABLEAU_MOTS;
@@ -79,15 +76,4 @@ void test_redimensionnement(void) {
     TEST_ASSERT_EQUAL(3, nombreMots);
     TEST_ASSERT_GREATER_OR_EQUAL(3, tailleTableau);
     free(tableauMots);
-}
-
-int main(void) {
-    UNITY_BEGIN();
-
-    RUN_TEST(test_ajouter_mot_nouveau);
-    RUN_TEST(test_incrementer_mot_existant);
-    RUN_TEST(test_incrementer_mot_10_fois);
-    RUN_TEST(test_redimensionnement);
-
-    return UNITY_END();
 }

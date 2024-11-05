@@ -51,3 +51,37 @@ void demanderFichier(char* chemin, int taille) {
     }
     chemin[strcspn(chemin, "\n")] = 0; // Supprime le saut de ligne
 }
+
+void triFusion(int i, int j, struct Mot tab[], struct Mot tmp[]) {
+    if (j <= i) {
+        return;
+    }
+
+    int m = (i + j) / 2;
+
+    triFusion(i, m, tab, tmp);     // trier la moitié gauche récursivement
+    triFusion(m + 1, j, tab, tmp); // trier la moitié droite récursivement
+    int pg = i;     // pg pointe au début du sous-tableau de gauche
+    int pd = m + 1; // pd pointe au début du sous-tableau de droite
+    int c;          // compteur
+
+    // on boucle de i à j pour remplir chaque élément du tableau final fusionné
+    for (c = i; c <= j; c++) {
+        if (pg == m + 1) { // le pointeur du sous-tableau de gauche a atteint la limite
+            tmp[c] = tab[pd];
+            pd++;
+        } else if (pd == j + 1) { // le pointeur du sous-tableau de droite a atteint la limite
+            tmp[c] = tab[pg];
+            pg++;
+        } else if (tab[pg].frequence > tab[pd].frequence) { // le pointeur du sous-tableau de gauche pointe vers un élément plus petit
+            tmp[c] = tab[pg];
+            pg++;
+        } else {  // le pointeur du sous-tableau de droite pointe vers un élément plus petit
+            tmp[c] = tab[pd];
+            pd++;
+        }
+    }
+    for (c = i; c <= j; c++) {  // copier les éléments de tmp[] à tab[]
+        tab[c] = tmp[c];
+    }
+}
