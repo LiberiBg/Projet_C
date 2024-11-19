@@ -12,9 +12,9 @@ TODO
 
 ## Compilation et Exécution
 
-1. Compiler avec Make :
+1. Compiler et éxecuter avec Make :
     ```sh
-    make
+    make all
     ```
 
 1. Compiler sans make :
