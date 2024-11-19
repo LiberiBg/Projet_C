@@ -19,7 +19,7 @@ TODO
 
 1. Compiler sans make :
     ```sh
-    gcc -Iinclude -o output src/*.c
+    gcc -Iinclude -o output src/features.c src/main.c
     ```
 
 2. Exécuter le programme avec la commande :
