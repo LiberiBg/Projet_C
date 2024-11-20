@@ -2,8 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include "struct.h"
+#include <sys/stat.h>
+#include <errno.h>
 
-#define MAX_PHRASE_LENGTH 1024
+#define MAX_NOM_LENGTH 1024
+#define MAX_NOMS_PER_PHRASE 1000
+#define TAILLE_INITIALE_TABLEAU 100
+#define MAX_MOT_LONGUEUR 50
+#define MAX_PHRASE_LENGTH 1000
+#define MAX_PHRASES 1000
+
 
 
 void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMots, int* tailleTableau) {
@@ -37,12 +45,29 @@ void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMot
 
 FILE* ouvrirFichierLecture(const char* chemin) {
     printf("Tentative d'ouverture du fichier : %s\n", chemin);
+    
+    // Vérifier si le fichier existe
+    struct stat buffer;
+    if (stat(chemin, &buffer) != 0) {
+        printf("Erreur : Le fichier %s n'existe pas.\n", chemin);
+        return NULL;
+    }
+
+    // Vérifier si c'est un fichier régulier
+    if (!S_ISREG(buffer.st_mode)) {
+        printf("Erreur : %s n'est pas un fichier régulier.\n", chemin);
+        return NULL;
+    }
+
     FILE* fichier = fopen(chemin, "r");
     if (fichier == NULL) {
         printf("Erreur : Impossible d'ouvrir le fichier %s\n", chemin);
-        perror("Raison");
-        exit(1);
+        printf("Code d'erreur : %d\n", errno);
+        printf("Description de l'erreur : %s\n", strerror(errno));
+        return NULL;
     }
+
+    printf("Fichier ouvert avec succès.\n");
     return fichier;
 }
 
@@ -143,7 +168,7 @@ int compterMots(FILE* fichier) {
     if (dansMot) {
         nombreMots++;
     }
-
+    rewind(fichier);
     return nombreMots; // retourner le nombre total de mots
 }
 
@@ -158,81 +183,177 @@ int compterCaracteres(FILE* fichier){
     }
 
     // Parcour le fichier et compte les caracteres
-    for(int caractere; (caractere = fgetc(fichier)) != EOF; ) {
-        nombreCaractere++;
+    while ((caractere = fgetc(fichier)) != EOF) {
+        if (caractere != ' ' && caractere != '\t' && caractere != '\n') {
+            nombreCaractere++;
+        }
     }
+    rewind(fichier);
 
     return nombreCaractere;  
 }
 
-
 // Définition d'une structure pour représenter une phrase
 typedef struct {
-    char phrase[MAX_PHRASE_LENGTH]; // tableau de caractères pour stocker la phrase
+    char phrase[MAX_PHRASE_LENGTH];
     int longueur; 
 } Phrase;
 
 // Fonction pour détecter les fins de phrase
-// Retourne 1 si le caractère est un point, un point d'exclamation ou un point d'interrogation, 0 sinon
 int estFinDePhrase(char c) {
     return (c == '.' || c == '!' || c == '?');
 }
 
 // Fonction pour calculer la longueur moyenne des phrases
-// Retourne la longueur moyenne des phrases
 float calculerLongueurMoyenne(Phrase* phrases, int nombrePhrases) {
-    int longueurTotale = 0; // variable pour stocker la longueur totale des phrases
+    if (nombrePhrases == 0) return 0;  // Éviter la division par zéro
+    int longueurTotale = 0;
     for (int i = 0; i < nombrePhrases; i++) {
-        longueurTotale += phrases[i].longueur; // additionne la longueur de chaque phrase
+        longueurTotale += phrases[i].longueur;
     }
     return (float)longueurTotale / nombrePhrases; 
 }
 
 // Fonction pour identifier la phrase la plus longue et la plus courte
-// Prend en entrée un tableau de phrases, le nombre de phrases et des pointeurs vers les phrases les plus longues et les plus courtes
 void trouverPhrasesExtremes(Phrase* phrases, int nombrePhrases, Phrase* plusLongue, Phrase* plusCourte) {
-    plusLongue->longueur = 0; 
-    plusCourte->longueur = MAX_PHRASE_LENGTH; 
+    if (nombrePhrases == 0) return;  // Gérer le cas où il n'y a pas de phrases
 
-    for (int i = 0; i < nombrePhrases; i++) {
-        if (phrases[i].longueur > plusLongue->longueur) { // si la longueur de la phrase courante est supérieure à la longueur de la phrase la plus longue
-            strcpy(plusLongue->phrase, phrases[i].phrase); // copie la phrase courante dans la phrase la plus longue
-            plusLongue->longueur = phrases[i].longueur; // met à jour la longueur de la phrase la plus longue
+    *plusLongue = phrases[0];
+    *plusCourte = phrases[0];
+
+    for (int i = 1; i < nombrePhrases; i++) {
+        if (phrases[i].longueur > plusLongue->longueur) {
+            *plusLongue = phrases[i];
         }
-        if (phrases[i].longueur < plusCourte->longueur) { // si la longueur de la phrase courante est inférieure à la longueur de la phrase la plus courte
-            strcpy(plusCourte->phrase, phrases[i].phrase); // copie la phrase courante dans la phrase la plus courte
-            plusCourte->longueur = phrases[i].longueur; // met à jour la longueur de la phrase la plus courte
+        if (phrases[i].longueur < plusCourte->longueur) {
+            *plusCourte = phrases[i];
         }
     }
 }
 
 // Fonction pour analyser les phrases dans un fichier
-// Prend en entrée un pointeur vers un fichier
 void analyserPhrases(FILE* fichier) {
-    Phrase phrases[MAX_PHRASE_LENGTH]; // tableau pour stocker les phrases
-    int nombrePhrases = 0; 
-    Phrase plusLongue, plusCourte; 
 
-    char c; 
-    int longueurPhrase = 0; 
-    char phrase[MAX_PHRASE_LENGTH]; 
+    if (fichier == NULL) {
+        printf("Erreur : Fichier non valide.\n");
+        return;
+    }
 
-    for (c = fgetc(fichier); c != EOF; c = fgetc(fichier)) { // boucle pour lire les caractères du fichier
-        if (estFinDePhrase(c)) { // si le caractère est un point, un point d'exclamation ou un point d'interrogation
-            phrase[longueurPhrase] = '\0'; 
-            phrases[nombrePhrases].longueur = longueurPhrase; // stocke la longueur de la phrase courante
-            strcpy(phrases[nombrePhrases].phrase, phrase); // copie la phrase courante dans le tableau de phrases
-            nombrePhrases++; 
+    Phrase phrases[MAX_PHRASES];
+    int nombrePhrases = 0;
+    Phrase plusLongue, plusCourte;
 
-            longueurPhrase = 0; 
+    char c;
+    int longueurPhrase = 0;
+    char phrase[MAX_PHRASE_LENGTH];
+
+    while ((c = fgetc(fichier)) != EOF && nombrePhrases < MAX_PHRASES) {
+        if (estFinDePhrase(c) || longueurPhrase == MAX_PHRASE_LENGTH - 1) {
+            phrase[longueurPhrase] = c;
+            phrase[longueurPhrase + 1] = '\0';
+            phrases[nombrePhrases].longueur = longueurPhrase + 1;
+            strcpy(phrases[nombrePhrases].phrase, phrase);
+            nombrePhrases++;
+            longueurPhrase = 0;
         } else {
-            phrase[longueurPhrase++] = c; // ajoute le caractère courant à la phrase courante
+            phrase[longueurPhrase++] = c;
         }
     }
-    float longueurMoyenne = calculerLongueurMoyenne(phrases, nombrePhrases); // calcule la longueur moyenne des phrases
-    trouverPhrasesExtremes(phrases, nombrePhrases, &plusLongue, &plusCourte); // identifie les phrases les plus longues et les plus courtes
 
-    printf("Longueur moyenne des phrases : %.2f\n", longueurMoyenne); 
-    printf("Phrase la plus longue : %s\n", plusLongue.phrase); 
-    printf("Phrase la plus courte : %s\n", plusCourte.phrase); 
+    if (longueurPhrase > 0 && nombrePhrases < MAX_PHRASES) {
+        phrase[longueurPhrase] = '\0';
+        phrases[nombrePhrases].longueur = longueurPhrase;
+        strcpy(phrases[nombrePhrases].phrase, phrase);
+        nombrePhrases++;
+    }
+
+    if (nombrePhrases == 0) {
+        printf("Aucune phrase trouvée dans le fichier.\n");
+        return;
+    }
+
+    float longueurMoyenne = calculerLongueurMoyenne(phrases, nombrePhrases);
+    trouverPhrasesExtremes(phrases, nombrePhrases, &plusLongue, &plusCourte);
+
+    printf("Nombre de phrases analysées : %d\n", nombrePhrases);
+    printf("Longueur moyenne des phrases : %.2f\n", longueurMoyenne);
+    printf("Phrase la plus longue (%d caractères) : %s\n", plusLongue.longueur, plusLongue.phrase);
+    printf("Phrase la plus courte (%d caractères) : %s\n", plusCourte.longueur, plusCourte.phrase);
+}
+
+// Fonction pour comparer deux mots selon leur fréquence
+int comparerMots(const void* a, const void* b) {
+    return ((struct Mot*)b)->frequence - ((struct Mot*)a)->frequence;
+}
+
+// Fonction pour trouver un mot dans un tableau de mots
+struct Mot* trouverMot(struct Mot* tableau, int taille, const char* mot) {
+    for (int i = 0; i < taille; i++) {
+        if (strcmp(tableau[i].mot, mot) == 0) {
+            return &tableau[i];
+        }
+    }
+    return NULL;
+}
+
+void analyseComparative(const char* fichier1, const char* fichier2) {
+    FILE *f1 = ouvrirFichierLecture(fichier1);
+    FILE *f2 = ouvrirFichierLecture(fichier2);
+    if (f1 == NULL || f2 == NULL) {
+        printf("Erreur lors de l'ouverture des fichiers.\n");
+        return;
+    }
+
+    struct Mot *mots1 = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
+    struct Mot *mots2 = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
+    int nombreMots1 = 0, nombreMots2 = 0;
+    int tailleTableau1 = TAILLE_INITIALE_TABLEAU, tailleTableau2 = TAILLE_INITIALE_TABLEAU;
+
+    char mot[MAX_MOT_LONGUEUR];
+    while (fscanf(f1, "%s", mot) == 1) {
+        ajouterMotOuIncrementer(mot, &mots1, &nombreMots1, &tailleTableau1);
+    }
+    while (fscanf(f2, "%s", mot) == 1) {
+        ajouterMotOuIncrementer(mot, &mots2, &nombreMots2, &tailleTableau2);
+    }
+
+    qsort(mots1, nombreMots1, sizeof(struct Mot), comparerMots);
+    qsort(mots2, nombreMots2, sizeof(struct Mot), comparerMots);
+
+    printf("\nAnalyse comparative :\n");
+    printf("Fichier 1 : %s\n", fichier1);
+    printf("Fichier 2 : %s\n\n", fichier2);
+
+    printf("Mots les plus fréquents dans le fichier 1 :\n");
+    for (int i = 0; i < 5 && i < nombreMots1; i++) {
+        printf("%s : %d\n", mots1[i].mot, mots1[i].frequence);
+    }
+
+    printf("\nMots les plus fréquents dans le fichier 2 :\n");
+    for (int i = 0; i < 5 && i < nombreMots2; i++) {
+        printf("%s : %d\n", mots2[i].mot, mots2[i].frequence);
+    }
+
+    printf("\nMots communs avec des fréquences différentes :\n");
+    for (int i = 0; i < nombreMots1; i++) {
+        struct Mot* motCommun = trouverMot(mots2, nombreMots2, mots1[i].mot);
+        if (motCommun && motCommun->frequence != mots1[i].frequence) {
+            printf("%s : %d (fichier 1) vs %d (fichier 2)\n", mots1[i].mot, mots1[i].frequence, motCommun->frequence);
+        }
+    }
+
+    // Analyse des phrases
+    rewind(f1);
+    rewind(f2);
+    printf("\nAnalyse des phrases :\n");
+    printf("Fichier 1 :\n");
+    analyserPhrases(f1);
+    printf("\nFichier 2 :\n");
+    analyserPhrases(f2);
+
+    fclose(f1);
+    fclose(f2);
+    free(mots1);
+    free(mots2);
+
 }
