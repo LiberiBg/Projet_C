@@ -1,5 +1,6 @@
-#ifndef FEATURES_H
-#define FEATURES_H
+#ifndef ANALYSEUR_H
+#define ANALYSEUR_H
+
 #include <stdio.h>
 #include "struct.h"
 

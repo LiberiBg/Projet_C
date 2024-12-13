@@ -1,15 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "features.h"
+#include "analyseur.h"
 #include "struct.h"
+#include <stdio.h>
 
 #define TAILLE_INITIALE_TABLEAU 10
 
-int main() {
+int main(int argc, char *argv[]) {
+
     struct Mot* tableauMots = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
     int nombreMots = 0;
-    struct Mot tmp[nombreMots];
+    struct Mot* tmp = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
     char chemin[256];
     char chemin1[256];
     char chemin2[256];
@@ -38,7 +40,7 @@ int main() {
     
     analyserPhrases(fichier);
 
-    triFusion(0, nombreMots, tableauMots, tableauMots);
+    triFusion(0, nombreMots, tableauMots, tmp);
 
     printf("Entrez le chemin du premier fichier : ");
     if (fgets(chemin1, sizeof(chemin1), stdin) == NULL) {

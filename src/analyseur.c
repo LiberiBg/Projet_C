@@ -153,7 +153,7 @@ int compterMots(FILE* fichier) {
         return -1;  // erreur
     }
 
-    for(int caractere; (caractere = fgetc(fichier)) != EOF; ) {
+    for(; (caractere = fgetc(fichier)) != EOF; ) {
         if (caractere == ' ' || caractere == '\n' || caractere == '\t') {
             if (dansMot) {
                 nombreMots++;
