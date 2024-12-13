@@ -10,7 +10,7 @@ INCLUDE_DIR = include
 
 # Fichiers source
 SRCS = src/main.c src/analyseur.c
-TEST_SRCS = $(wildcard $(TEST_DIR)/*.c)
+TEST_SRCS = $(wildcard $(TEST_DIR)/*.c) $(filter-out $(SRC_DIR)/main.c, $(wildcard $(SRC_DIR)/*.c))
 
 # Exécutables
 EXEC = output
@@ -28,8 +28,8 @@ $(EXEC): $(SRCS)
 test: $(TEST_EXEC)
 	./$(TEST_EXEC)
 
-$(TEST_EXEC): $(TEST_SRCS) $(SRCS)
-	$(CC) $(CFLAGS) $(INCLUDES) `pkg-config --cflags gtk+-3.0` $(TEST_SRCS) $(filter-out $(SRC_DIR)/main.c,$(SRCS)) -o $@
+$(TEST_EXEC): $(TEST_SRCS)
+	$(CC) $(CFLAGS) $(INCLUDES) `pkg-config --cflags gtk+-3.0` $(TEST_SRCS) -o $@
 
 # Nettoyage
 clean:
