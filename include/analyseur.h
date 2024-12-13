@@ -22,4 +22,6 @@ void analyserPhrases(FILE* fichier);
 
 void analyseComparative(const char *fichier1, const char *fichier2);
 
+void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMots, int* tailleTableau);
+
 #endif

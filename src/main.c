@@ -46,6 +46,7 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     }
 
     int tailleTableau = TAILLE_INITIALE_TABLEAU;
+    mettreAJourFrequence(fichier, &tableauMots, &nombreMots, &tailleTableau);
 
     struct Mot* tmp = malloc(nombreMots * sizeof(struct Mot));
     if (tmp == NULL) {
