@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
     char chemin[256];
     char chemin1[256];
     char chemin2[256];
+    char cheminSortie[256]; 
     int nombreLigne = 0;
     int nombreCaracteres = 0;
 
@@ -40,7 +41,18 @@ int main(int argc, char *argv[]) {
     
     analyserPhrases(fichier);
 
-    triFusion(0, nombreMots, tableauMots, tmp);
+    triFusion(0, nombreMots, tableauMots, tableauMots);
+    // Ajout de la demande de chemin pour sauvegarder les résultats
+    printf("Entrez le chemin du fichier de sortie : ");
+    if (fgets(cheminSortie, sizeof(cheminSortie), stdin) == NULL) {
+        fprintf(stderr, "Erreur de lecture pour le fichier de sortie\n");
+        free(tableauMots);
+        return 1;
+    }
+    cheminSortie[strcspn(cheminSortie, "\n")] = 0; // Supprime le saut de ligne
+
+    // Appel à la fonction sauvegarderResultats
+    sauvegarderResultats(cheminSortie, nombreLigne, nombreMots, nombreCaracteres, tableauMots, nombreMots);
 
     printf("Entrez le chemin du premier fichier : ");
     if (fgets(chemin1, sizeof(chemin1), stdin) == NULL) {

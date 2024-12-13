@@ -22,4 +22,8 @@ void analyserPhrases(FILE* fichier);
 
 void analyseComparative(const char *fichier1, const char *fichier2);
 
+void sauvegarderResultats(const char* chemin, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int tailleTableau);
+
+void afficherTableauMots(struct Mot* tableau, int taille);
+
 #endif
