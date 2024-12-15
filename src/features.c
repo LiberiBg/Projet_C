@@ -4,6 +4,9 @@
 #include "struct.h"
 #include <sys/stat.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <ctype.h>  
+
 
 #define MAX_NOM_LENGTH 1024
 #define MAX_NOMS_PER_PHRASE 1000
@@ -11,7 +14,8 @@
 #define MAX_MOT_LONGUEUR 50
 #define MAX_PHRASE_LENGTH 1000
 #define MAX_PHRASES 1000
-
+#define MAX_MOTS_FREQUENTS 5
+#define MAX_MOTS_COMMUNS 100
 
 
 void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMots, int* tailleTableau) {
@@ -296,19 +300,39 @@ struct Mot* trouverMot(struct Mot* tableau, int taille, const char* mot) {
     return NULL;
 }
 
-void analyseComparative(const char* fichier1, const char* fichier2) {
+#define MAX_MOTS_FREQUENTS 5
+#define MAX_MOTS_COMMUNS 100
+
+struct ResultatAnalyseComparative {
+    struct {
+        struct Mot motsFrequents[MAX_MOTS_FREQUENTS];
+        int nombreMotsFrequents;
+    } fichier1, fichier2;
+    struct {
+        char mot[MAX_MOT_LONGUEUR];
+        int frequenceFichier1;
+        int frequenceFichier2;
+    } motsCommuns[MAX_MOTS_COMMUNS];
+    int nombreMotsCommuns;
+};
+
+struct ResultatAnalyseComparative analyseComparative(const char* fichier1, const char* fichier2) {
+    struct ResultatAnalyseComparative resultat = {0};  // Initialise tous les champs à zéro
+
+    // Ouverture des fichiers en mode lecture
     FILE *f1 = ouvrirFichierLecture(fichier1);
     FILE *f2 = ouvrirFichierLecture(fichier2);
     if (f1 == NULL || f2 == NULL) {
-        printf("Erreur lors de l'ouverture des fichiers.\n");
-        return;
+        return resultat;  // Retourne une structure vide en cas d'erreur
     }
 
+    // Allocation dynamique des tableaux de mots pour chaque fichier
     struct Mot *mots1 = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
     struct Mot *mots2 = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
     int nombreMots1 = 0, nombreMots2 = 0;
     int tailleTableau1 = TAILLE_INITIALE_TABLEAU, tailleTableau2 = TAILLE_INITIALE_TABLEAU;
 
+    // Lecture et comptage des mots dans chaque fichier
     char mot[MAX_MOT_LONGUEUR];
     while (fscanf(f1, "%s", mot) == 1) {
         ajouterMotOuIncrementer(mot, &mots1, &nombreMots1, &tailleTableau1);
@@ -317,43 +341,51 @@ void analyseComparative(const char* fichier1, const char* fichier2) {
         ajouterMotOuIncrementer(mot, &mots2, &nombreMots2, &tailleTableau2);
     }
 
+    // Tri des mots par fréquence décroissante
     qsort(mots1, nombreMots1, sizeof(struct Mot), comparerMots);
     qsort(mots2, nombreMots2, sizeof(struct Mot), comparerMots);
 
-    printf("\nAnalyse comparative :\n");
-    printf("Fichier 1 : %s\n", fichier1);
-    printf("Fichier 2 : %s\n\n", fichier2);
-
-    printf("Mots les plus fréquents dans le fichier 1 :\n");
-    for (int i = 0; i < 5 && i < nombreMots1; i++) {
-        printf("%s : %d\n", mots1[i].mot, mots1[i].frequence);
+    // Stockage des 5 mots les plus fréquents dans le résultat
+    for (int i = 0; i < MAX_MOTS_FREQUENTS && i < nombreMots1; i++) {
+        resultat.fichier1.motsFrequents[i] = mots1[i];
+        resultat.fichier1.nombreMotsFrequents++;
+    }
+    for (int i = 0; i < MAX_MOTS_FREQUENTS && i < nombreMots2; i++) {
+        resultat.fichier2.motsFrequents[i] = mots2[i];
+        resultat.fichier2.nombreMotsFrequents++;
     }
 
-    printf("\nMots les plus fréquents dans le fichier 2 :\n");
-    for (int i = 0; i < 5 && i < nombreMots2; i++) {
-        printf("%s : %d\n", mots2[i].mot, mots2[i].frequence);
-    }
-
-    printf("\nMots communs avec des fréquences différentes :\n");
-    for (int i = 0; i < nombreMots1; i++) {
+    // Recherche des mots communs avec des fréquences différentes
+    for (int i = 0; i < nombreMots1 && resultat.nombreMotsCommuns < MAX_MOTS_COMMUNS; i++) {
         struct Mot* motCommun = trouverMot(mots2, nombreMots2, mots1[i].mot);
         if (motCommun && motCommun->frequence != mots1[i].frequence) {
-            printf("%s : %d (fichier 1) vs %d (fichier 2)\n", mots1[i].mot, mots1[i].frequence, motCommun->frequence);
+            strcpy(resultat.motsCommuns[resultat.nombreMotsCommuns].mot, mots1[i].mot);
+            resultat.motsCommuns[resultat.nombreMotsCommuns].frequenceFichier1 = mots1[i].frequence;
+            resultat.motsCommuns[resultat.nombreMotsCommuns].frequenceFichier2 = motCommun->frequence;
+            resultat.nombreMotsCommuns++;
         }
     }
 
-    // Analyse des phrases
-    rewind(f1);
-    rewind(f2);
-    printf("\nAnalyse des phrases :\n");
-    printf("Fichier 1 :\n");
-    analyserPhrases(f1);
-    printf("\nFichier 2 :\n");
-    analyserPhrases(f2);
-
+    // Fermeture des fichiers et libération de la mémoire
     fclose(f1);
     fclose(f2);
     free(mots1);
     free(mots2);
 
+    return resultat;
+}
+
+int estPalindrome(const char* mot) {
+    int debut = 0;
+    int fin = strlen(mot) - 1;
+    while (debut < fin) {
+        while (debut < fin && !isalpha(mot[debut])) debut++;
+        while (debut < fin && !isalpha(mot[fin])) fin--;
+        if (tolower(mot[debut]) != tolower(mot[fin])) {
+            return 0;
+        }
+        debut++;
+        fin--;
+    }
+    return 1;
 }
