@@ -394,7 +394,6 @@ int estPalindrome(const char* mot) {
 
 
 
-
 void sauvegarderResultats(const char* cheminSortie, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int nombreMotsDistincts) {
     FILE* fichier = fopen(cheminSortie, "w");
     if (fichier == NULL) {
