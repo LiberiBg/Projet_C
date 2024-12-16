@@ -142,4 +142,16 @@ int main(int argc, char *argv[]) {
 
     gtk_main();
     return 0;
+
+    // Ajout de la demande de chemin pour sauvegarder les résultats
+    printf("Entrez le chemin du fichier de sortie : ");
+    if (fgets(cheminSortie, sizeof(cheminSortie), stdin) == NULL) {
+        fprintf(stderr, "Erreur de lecture pour le fichier de sortie\n");
+        free(tableauMots);
+        return 1;
+    }
+    cheminSortie[strcspn(cheminSortie, "\n")] = 0; // Supprime le saut de ligne
+
+    // Appel à la fonction sauvegarderResultats
+    sauvegarderResultats(cheminSortie, nombreLigne, nombreMots, nombreCaracteres, tableauMots, nombreMots);
 }
