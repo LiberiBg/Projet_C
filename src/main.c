@@ -1,11 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <gtk/gtk.h>
 #include "analyseur.h"
 #include "struct.h"
-#include <stdio.h>
+#include <ctype.h>
 
 #define TAILLE_INITIALE_TABLEAU 10
+#define MAX_CHEMIN 1024
+
+// Variables globales
+int nombreCaracteres;
+char chemin1[MAX_CHEMIN];
+char chemin2[MAX_CHEMIN];
 
 void on_save_button_clicked(GtkWidget *widget, gpointer data) {
     GtkWidget *dialog;
@@ -65,6 +72,7 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     if (tableauMots == NULL) {
         fprintf(stderr, "Erreur : impossible d'allouer la mémoire pour tableauMots\n");
         fclose(fichier);
+        g_free(chemin);
         return;
     }
 
@@ -76,11 +84,12 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
         fprintf(stderr, "Erreur : impossible d'allouer la mémoire pour tmp\n");
         free(tableauMots);
         fclose(fichier);
+        g_free(chemin);
         return;
     }
 
-    g_free(chemin);
     fclose(fichier);
+    g_free(chemin);
 
     triFusion(0, nombreMots - 1, tableauMots, tmp);
 
@@ -88,7 +97,8 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     if (fgets(chemin1, sizeof(chemin1), stdin) == NULL) {
         fprintf(stderr, "Erreur de lecture pour le premier fichier\n");
         free(tableauMots);
-        return 1;
+        free(tmp);
+        return;
     }
     chemin1[strcspn(chemin1, "\n")] = 0; // Supprime le saut de ligne
 
@@ -96,14 +106,15 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     if (fgets(chemin2, sizeof(chemin2), stdin) == NULL) {
         fprintf(stderr, "Erreur de lecture pour le deuxième fichier\n");
         free(tableauMots);
-        return 1;
+        free(tmp);
+        return;
     }
     chemin2[strcspn(chemin2, "\n")] = 0; // Supprime le saut de ligne
 
     struct ResultatAnalyseComparative resultat = analyseComparative(chemin1, chemin2);
 
+    // Ici, vous pouvez ajouter le code pour traiter le résultat de l'analyse comparative
 
-    
-    return 0;
-
+    free(tableauMots);
+    free(tmp);
 }

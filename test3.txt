@@ -1,0 +1,28 @@
+Analyse du fichier :
+Nombre de lignes : 4
+Nombre de mots : 21
+Nombre de caractères : 98
+Nombre de mots distincts : 21
+
+Liste des mots et leur fréquence :
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
+a : 1814065765
