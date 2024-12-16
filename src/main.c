@@ -59,7 +59,7 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     g_free(chemin);
     fclose(fichier);
 
-    // triFusion(0, nombreMots, tableauMots, tmp); CASSÉ
+    triFusion(0, nombreMots - 1, tableauMots, tmp);
 
     free(tableauMots);
     free(tmp);
