@@ -7,6 +7,29 @@
 
 #define TAILLE_INITIALE_TABLEAU 10
 
+void on_save_button_clicked(GtkWidget *widget, gpointer data) {
+    GtkWidget *dialog;
+    GtkFileChooser *chooser;
+    
+    dialog = gtk_file_chooser_dialog_new("Sauvegarder les résultats",
+                                       GTK_WINDOW(gtk_widget_get_toplevel(widget)),
+                                       GTK_FILE_CHOOSER_ACTION_SAVE,
+                                       "Annuler", GTK_RESPONSE_CANCEL,
+                                       "Sauvegarder", GTK_RESPONSE_ACCEPT,
+                                       NULL);
+    
+    gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
+    
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        printf("Fichier sélectionné : %s\n", filename);
+        // En attente de la récupération des données à sauvegarder
+        g_free(filename);
+    }
+    
+    gtk_widget_destroy(dialog);
+}
+
 void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     GtkFileChooser *chooser = GTK_FILE_CHOOSER(data);
     char *chemin = gtk_file_chooser_get_filename(chooser);
@@ -138,20 +161,14 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(vbox), compare_button, FALSE, FALSE, 0);
 
     gtk_container_add(GTK_CONTAINER(window), vbox);
+
+    GtkWidget *save_button = gtk_button_new_with_label("Sauvegarder les résultats");
+    g_signal_connect(save_button, "clicked", G_CALLBACK(on_save_button_clicked), NULL);
+    gtk_box_pack_start(GTK_BOX(vbox), save_button, FALSE, FALSE, 0);
+
     gtk_widget_show_all(window);
 
     gtk_main();
     return 0;
 
-    // Ajout de la demande de chemin pour sauvegarder les résultats
-    printf("Entrez le chemin du fichier de sortie : ");
-    if (fgets(cheminSortie, sizeof(cheminSortie), stdin) == NULL) {
-        fprintf(stderr, "Erreur de lecture pour le fichier de sortie\n");
-        free(tableauMots);
-        return 1;
-    }
-    cheminSortie[strcspn(cheminSortie, "\n")] = 0; // Supprime le saut de ligne
-
-    // Appel à la fonction sauvegarderResultats
-    sauvegarderResultats(cheminSortie, nombreLigne, nombreMots, nombreCaracteres, tableauMots, nombreMots);
 }

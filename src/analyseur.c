@@ -381,7 +381,7 @@ void analyseComparative(const char* fichier1, const char* fichier2) {
 
 
 
-void sauvegarderResultats(char* cheminSortie, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int nombreMotsDistincts) {
+void sauvegarderResultats(const char* cheminSortie, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int nombreMotsDistincts) {
     FILE* fichier = fopen(cheminSortie, "w");
     if (fichier == NULL) {
         perror("Erreur lors de l'ouverture du fichier de sortie");
