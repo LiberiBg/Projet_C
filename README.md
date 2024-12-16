@@ -12,14 +12,14 @@ TODO
 
 ## Compilation et Exécution
 
-1. Compiler avec Make :
+1. Compiler et éxecuter avec Make :
     ```sh
-    make
+    make all
     ```
 
 1. Compiler sans make :
     ```sh
-    gcc -Iinclude -o output src/features.c src/main.c
+    gcc -Iinclude -o output src/analyseur.c src/main.c
     ```
 
 2. Exécuter le programme avec la commande :
@@ -39,7 +39,7 @@ Certaines méthodes du projet sont testés via le framework Unity, pour lancer l
 
 2. Lancer les TU sans make:
     ```sh
-    gcc -Iinclude -o test_output tests/*.c src/unity.c src/features.c
+    gcc -Iinclude -o test_output tests/*.c src/unity.c src/analyseur.c
     ```
 3. Exécuter le programme si compilé sans make :
     ```sh

@@ -1,29 +1,51 @@
-# Variables de compilation
+# Compilateur et options
 CC = gcc
-CFLAGS = -Iinclude
+CFLAGS = -Wall -Wextra
+INCLUDES = -I./include -I./src `pkg-config --cflags gtk+-3.0`
+LIBS = `pkg-config --libs gtk+-3.0`
 
-LDFLAGS = #Libs externes
+# Répertoires
+SRC_DIR = src
+BUILD_DIR = build
+TEST_DIR = tests
+INCLUDE_DIR = include
 
-TARGET = output
-SRC = src/features.c src/main.c
-TEST_TARGET = test_output
-TEST_SRC = tests/*.c src/unity.c src/features.c  # Ajouter tout autre fichier source à tester ici 
+# Fichiers source
+SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/analyseur.c
+TEST_SRCS = $(wildcard $(TEST_DIR)/*.c) $(filter-out $(SRC_DIR)/main.c, $(wildcard $(SRC_DIR)/*.c))
 
-.PHONY: all clean test
+# Exécutables
+EXEC = program
+TEST_EXEC = test_program
+BUILD_EXEC = $(BUILD_DIR)/program
 
-all: $(TARGET)
+# Règle par défaut : nettoie, compile et exécute
+all: clean $(EXEC)
+	./$(EXEC)
 
-$(TARGET): $(SRC)
-	rm -f $(TARGET)
-	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)
-	./$(TARGET)
+# Compilation du programme principal
+$(EXEC): $(SRCS)
+	$(CC) $(CFLAGS) $(INCLUDES) $(SRCS) -o $@ $(LIBS)
 
-$(TEST_TARGET): $(TEST_SRC)
-	rm -f $(TEST_TARGET)
-	$(CC) $(CFLAGS) -o $(TEST_TARGET) $(TEST_SRC)
+# Compilation et exécution des tests
+test: $(TEST_EXEC)
+	./$(TEST_EXEC)
 
-test: $(TEST_TARGET)
-	./$(TEST_TARGET)
+$(TEST_EXEC): $(TEST_SRCS)
+	$(CC) $(CFLAGS) $(INCLUDES) $(TEST_SRCS) -o $@ $(LIBS)
 
+# Compilation dans le répertoire build
+compile: $(BUILD_DIR) $(BUILD_EXEC)
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+$(BUILD_EXEC): $(SRCS)
+	$(CC) $(CFLAGS) $(INCLUDES) $(SRCS) -o $@ $(LIBS)
+
+# Nettoyage
 clean:
-	rm -f $(TARGET) $(TEST_TARGET)
+	rm -f $(EXEC) $(TEST_EXEC) $(BUILD_EXEC) *.o
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all clean test compile

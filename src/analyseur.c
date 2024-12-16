@@ -16,7 +16,7 @@
 #define MAX_PHRASES 1000
 #define MAX_MOTS_FREQUENTS 5
 #define MAX_MOTS_COMMUNS 100
-
+#define TAILLE_MAX_MOT 100  
 
 void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMots, int* tailleTableau) {
     // Parcourt les mots existants dans le tableau
@@ -157,7 +157,7 @@ int compterMots(FILE* fichier) {
         return -1;  // erreur
     }
 
-    for(int caractere; (caractere = fgetc(fichier)) != EOF; ) {
+    for(; (caractere = fgetc(fichier)) != EOF; ) {
         if (caractere == ' ' || caractere == '\n' || caractere == '\t') {
             if (dansMot) {
                 nombreMots++;
@@ -329,6 +329,12 @@ struct ResultatAnalyseComparative analyseComparative(const char* fichier1, const
     // Allocation dynamique des tableaux de mots pour chaque fichier
     struct Mot *mots1 = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
     struct Mot *mots2 = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
+    
+    if (mots1 == NULL || mots2 == NULL) {
+    perror("Erreur d'allocation mémoire");
+    exit(EXIT_FAILURE);
+    }
+
     int nombreMots1 = 0, nombreMots2 = 0;
     int tailleTableau1 = TAILLE_INITIALE_TABLEAU, tailleTableau2 = TAILLE_INITIALE_TABLEAU;
 
@@ -388,4 +394,46 @@ int estPalindrome(const char* mot) {
         fin--;
     }
     return 1;
+}
+
+
+
+
+void sauvegarderResultats(char* cheminSortie, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int nombreMotsDistincts) {
+    FILE* fichier = fopen(cheminSortie, "w");
+    if (fichier == NULL) {
+        perror("Erreur lors de l'ouverture du fichier de sortie");
+        return;
+    }
+
+    // Écrire les résultats dans le fichier
+    fprintf(fichier, "Analyse du fichier :\n");
+    fprintf(fichier, "Nombre de lignes : %d\n", nombreLignes);
+    fprintf(fichier, "Nombre de mots : %d\n", nombreMots);
+    fprintf(fichier, "Nombre de caractères : %d\n", nombreCaracteres);
+    fprintf(fichier, "Nombre de mots distincts : %d\n", nombreMotsDistincts);
+    fprintf(fichier, "\nListe des mots et leur fréquence :\n");
+
+    // Trier les mots par fréquence avant de les afficher
+    qsort(tableauMots, nombreMotsDistincts, sizeof(struct Mot), comparerMots);
+
+    // Affichage des mots et leur fréquence
+    for (int i = 0; i < nombreMotsDistincts; i++) {
+        fprintf(fichier, "%s : %d\n", tableauMots[i].mot, tableauMots[i].frequence);
+    }
+
+    fclose(fichier);
+    printf("Les résultats ont été sauvegardés dans le fichier : %s\n", cheminSortie);
+}
+
+void afficherTableauMots(struct Mot* tableau, int taille) {
+    printf("État actuel du tableau de mots :\n");
+    for (int i = 0; i < taille; i++) {
+       for (int j = 0; j < TAILLE_MAX_MOT; j++) { 
+        if(tableau[i].mot[j] >0)
+        printf("%c",tableau[i].mot[j]);
+       }
+        printf("Fréquence : %d\n", tableau[i].frequence);
+    }
+    printf("\n");
 }

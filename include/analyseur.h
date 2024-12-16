@@ -1,5 +1,6 @@
-#ifndef FEATURES_H
-#define FEATURES_H
+#ifndef ANALYSEUR_H
+#define ANALYSEUR_H
+
 #include <stdio.h>
 #include "struct.h"
 
@@ -39,5 +40,9 @@ struct ResultatAnalyseComparative {
 struct ResultatAnalyseComparative analyseComparative(const char *fichier1, const char *fichier2);
 
 int estPalindrome(const char* mot);
+
+void sauvegarderResultats(const char* chemin, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int tailleTableau);
+
+void afficherTableauMots(struct Mot* tableau, int taille);
 
 #endif
