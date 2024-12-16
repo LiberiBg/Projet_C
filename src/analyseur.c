@@ -4,9 +4,14 @@
 #include "struct.h"
 #include <sys/stat.h>
 #include <errno.h>
+<<<<<<< HEAD
 #include <sys/stat.h>
 #include <ctype.h>  
 
+=======
+#include "analyseur.h"
+#include <ctype.h>
+>>>>>>> 735dc21cea8d59133bf61f74137c7a824bab5474
 
 #define MAX_NOM_LENGTH 1024
 #define MAX_NOMS_PER_PHRASE 1000
@@ -14,9 +19,28 @@
 #define MAX_MOT_LONGUEUR 50
 #define MAX_PHRASE_LENGTH 1000
 #define MAX_PHRASES 1000
+<<<<<<< HEAD
 #define MAX_MOTS_FREQUENTS 5
 #define MAX_MOTS_COMMUNS 100
 #define TAILLE_MAX_MOT 100  
+=======
+
+
+void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMots, int* tailleTableau) {
+    char mot[100];
+    int index = 0;
+
+    rewind(fichier);
+
+    while (fscanf(fichier, "%99s", mot) == 1) {
+        // Convertir le mot en minuscules pour éviter les doublons dus à la casse
+        for (int i = 0; mot[i]; i++) {
+            mot[i] = tolower(mot[i]);
+        }
+        ajouterMotOuIncrementer(mot, tableauMots, nombreMots, tailleTableau);
+    }
+}
+>>>>>>> 735dc21cea8d59133bf61f74137c7a824bab5474
 
 void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMots, int* tailleTableau) {
     // Parcourt les mots existants dans le tableau
@@ -144,7 +168,6 @@ int compterLignes(FILE* fichier) {
 
     return nombreLignes;
 }
-
 
 int compterMots(FILE* fichier) {
 
@@ -399,7 +422,7 @@ int estPalindrome(const char* mot) {
 
 
 
-void sauvegarderResultats(char* cheminSortie, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int nombreMotsDistincts) {
+void sauvegarderResultats(const char* cheminSortie, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int nombreMotsDistincts) {
     FILE* fichier = fopen(cheminSortie, "w");
     if (fichier == NULL) {
         perror("Erreur lors de l'ouverture du fichier de sortie");

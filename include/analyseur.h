@@ -41,6 +41,7 @@ struct ResultatAnalyseComparative analyseComparative(const char *fichier1, const
 
 int estPalindrome(const char* mot);
 
+void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMots, int* tailleTableau);
 void sauvegarderResultats(const char* chemin, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int tailleTableau);
 
 void afficherTableauMots(struct Mot* tableau, int taille);

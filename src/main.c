@@ -3,59 +3,86 @@
 #include <string.h>
 #include "analyseur.h"
 #include "struct.h"
-
-#include <ctype.h>
 #include <stdio.h>
-
 
 #define TAILLE_INITIALE_TABLEAU 10
 
-int main(int argc, char *argv[]) {
-
-    struct Mot* tableauMots = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
-    int nombreMots = 0;
-    struct Mot* tmp = malloc(TAILLE_INITIALE_TABLEAU * sizeof(struct Mot));
-    char chemin[256];
-    char chemin1[256];
-    char chemin2[256];
-    char cheminSortie[256]; 
-    int nombreLigne = 0;
-    int nombreCaracteres = 0;
-
-    demanderFichier(chemin, sizeof(chemin));
-
-    FILE* fichier = ouvrirFichierLecture(chemin);
-    if (fichier == NULL) {
-        return 1;
+void on_save_button_clicked(GtkWidget *widget, gpointer data) {
+    GtkWidget *dialog;
+    GtkFileChooser *chooser;
+    
+    dialog = gtk_file_chooser_dialog_new("Sauvegarder les résultats",
+                                       GTK_WINDOW(gtk_widget_get_toplevel(widget)),
+                                       GTK_FILE_CHOOSER_ACTION_SAVE,
+                                       "Annuler", GTK_RESPONSE_CANCEL,
+                                       "Sauvegarder", GTK_RESPONSE_ACCEPT,
+                                       NULL);
+    
+    gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
+    
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        printf("Fichier sélectionné : %s\n", filename);
+        // En attente de la récupération des données à sauvegarder
+        g_free(filename);
     }
     
-    printf("Fichier lu avec succes!\n");
+    gtk_widget_destroy(dialog);
+}
 
-    nombreLigne = compterLignes(fichier);
+void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
+    GtkFileChooser *chooser = GTK_FILE_CHOOSER(data);
+    char *chemin = gtk_file_chooser_get_filename(chooser);
+    
+    if (chemin == NULL) {
+        fprintf(stderr, "Erreur : aucun fichier sélectionné\n");
+        return;
+    }
+
+    FILE *fichier = ouvrirFichierLecture(chemin);
+    if (fichier == NULL) {
+        fprintf(stderr, "Erreur : impossible d'ouvrir le fichier %s\n", chemin);
+        g_free(chemin);
+        return;
+    }
+    
+    printf("Fichier lu avec succès!\n");
+
+    int nombreLigne = compterLignes(fichier);
     printf("Nombre de lignes : %d\n", nombreLigne);
 
-    nombreMots = compterMots(fichier);
+    int nombreMots = compterMots(fichier);
     printf("Nombre de mots : %d\n", nombreMots);
 
     nombreCaracteres = compterCaracteres(fichier);
-    printf("Nombre de caracteres : %d\n", nombreCaracteres);
+    printf("Nombre de caractères : %d\n", nombreCaracteres);
 
     rewind(fichier);
     
     analyserPhrases(fichier);
 
-    triFusion(0, nombreMots, tableauMots, tableauMots);
-    // Ajout de la demande de chemin pour sauvegarder les résultats
-    printf("Entrez le chemin du fichier de sortie : ");
-    if (fgets(cheminSortie, sizeof(cheminSortie), stdin) == NULL) {
-        fprintf(stderr, "Erreur de lecture pour le fichier de sortie\n");
-        free(tableauMots);
-        return 1;
+    struct Mot* tableauMots = malloc(nombreMots * sizeof(struct Mot));
+    if (tableauMots == NULL) {
+        fprintf(stderr, "Erreur : impossible d'allouer la mémoire pour tableauMots\n");
+        fclose(fichier);
+        return;
     }
-    cheminSortie[strcspn(cheminSortie, "\n")] = 0; // Supprime le saut de ligne
 
-    // Appel à la fonction sauvegarderResultats
-    sauvegarderResultats(cheminSortie, nombreLigne, nombreMots, nombreCaracteres, tableauMots, nombreMots);
+    int tailleTableau = TAILLE_INITIALE_TABLEAU;
+    mettreAJourFrequence(fichier, &tableauMots, &nombreMots, &tailleTableau);
+
+    struct Mot* tmp = malloc(nombreMots * sizeof(struct Mot));
+    if (tmp == NULL) {
+        fprintf(stderr, "Erreur : impossible d'allouer la mémoire pour tmp\n");
+        free(tableauMots);
+        fclose(fichier);
+        return;
+    }
+
+    g_free(chemin);
+    fclose(fichier);
+
+    triFusion(0, nombreMots - 1, tableauMots, tmp);
 
     printf("Entrez le chemin du premier fichier : ");
     if (fgets(chemin1, sizeof(chemin1), stdin) == NULL) {
@@ -65,9 +92,9 @@ int main(int argc, char *argv[]) {
     }
     chemin1[strcspn(chemin1, "\n")] = 0; // Supprime le saut de ligne
 
-    printf("Entrez le chemin du deuxieme fichier : ");
+    printf("Entrez le chemin du deuxième fichier : ");
     if (fgets(chemin2, sizeof(chemin2), stdin) == NULL) {
-        fprintf(stderr, "Erreur de lecture pour le deuxieme fichier\n");
+        fprintf(stderr, "Erreur de lecture pour le deuxième fichier\n");
         free(tableauMots);
         return 1;
     }
@@ -75,30 +102,8 @@ int main(int argc, char *argv[]) {
 
     struct ResultatAnalyseComparative resultat = analyseComparative(chemin1, chemin2);
 
-    printf("Mots les plus fréquents dans le fichier 1 :\n");
-    for (int i = 0; i < resultat.fichier1.nombreMotsFrequents; i++) {
-        printf("%s : %d\n", resultat.fichier1.motsFrequents[i].mot, resultat.fichier1.motsFrequents[i].frequence);
-    }
 
-    printf("\nMots les plus fréquents dans le fichier 2 :\n");
-    for (int i = 0; i < resultat.fichier2.nombreMotsFrequents; i++) {
-        printf("%s : %d\n", resultat.fichier2.motsFrequents[i].mot, resultat.fichier2.motsFrequents[i].frequence);
-    }
-
-    printf("\nMots communs avec des fréquences différentes :\n");
-    for (int i = 0; i < resultat.nombreMotsCommuns; i++) {
-        printf("Mot : %s\n", resultat.motsCommuns[i].mot);
-        //printf("    Fréquence dans %s : %d\n", fichier1, resultat.motsCommuns[i].frequenceFichier1);
-        //printf("    Fréquence dans %s : %d\n", fichier2, resultat.motsCommuns[i].frequenceFichier2);
-    }
-
-    printf("\nDetection des palindromes :\n");
-    rewind(fichier);
-    char mot[256];
-    while (fscanf(fichier, "%255s", mot) == 1) {
-        if (estPalindrome(mot) && strlen(mot) > 1) {
-            printf("%s\n", mot);
-        }
-    } 
+    
     return 0;
+
 }
