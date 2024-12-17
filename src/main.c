@@ -14,28 +14,6 @@ int nombreCaracteres;
 char chemin1[MAX_CHEMIN];
 char chemin2[MAX_CHEMIN];
 
-void on_save_button_clicked(GtkWidget *widget, gpointer data) {
-    GtkWidget *dialog;
-    GtkFileChooser *chooser;
-    
-    dialog = gtk_file_chooser_dialog_new("Sauvegarder les résultats",
-                                       GTK_WINDOW(gtk_widget_get_toplevel(widget)),
-                                       GTK_FILE_CHOOSER_ACTION_SAVE,
-                                       "Annuler", GTK_RESPONSE_CANCEL,
-                                       "Sauvegarder", GTK_RESPONSE_ACCEPT,
-                                       NULL);
-    
-    gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
-    
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-        printf("Fichier sélectionné : %s\n", filename);
-        // En attente de la récupération des données à sauvegarder
-        g_free(filename);
-    }
-    
-    gtk_widget_destroy(dialog);
-}
 
 typedef struct AppWidgets {
     GtkWidget *text_view;
@@ -136,28 +114,6 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     g_free(chemin);
 
     triFusion(0, nombreMots - 1, tableauMots, tmp);
-
-    printf("Entrez le chemin du premier fichier : ");
-    if (fgets(chemin1, sizeof(chemin1), stdin) == NULL) {
-        fprintf(stderr, "Erreur de lecture pour le premier fichier\n");
-        free(tableauMots);
-        free(tmp);
-        return;
-    }
-    chemin1[strcspn(chemin1, "\n")] = 0; // Supprime le saut de ligne
-
-    printf("Entrez le chemin du deuxième fichier : ");
-    if (fgets(chemin2, sizeof(chemin2), stdin) == NULL) {
-        fprintf(stderr, "Erreur de lecture pour le deuxième fichier\n");
-        free(tableauMots);
-        free(tmp);
-        return;
-    }
-    chemin2[strcspn(chemin2, "\n")] = 0; // Supprime le saut de ligne
-
-    struct ResultatAnalyseComparative resultat = analyseComparative(chemin1, chemin2);
-
-    // Ici, vous pouvez ajouter le code pour traiter le résultat de l'analyse comparative
 
     free(tableauMots);
     free(tmp);
