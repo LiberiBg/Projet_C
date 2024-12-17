@@ -13,8 +13,6 @@
 #define MAX_PHRASE_LENGTH 1000
 #define MAX_PHRASES 1000
 
-
-
 void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMots, int* tailleTableau) {
     // Parcourt les mots existants dans le tableau
     for (int i = 0; i < *nombreMots; i++) {
@@ -431,4 +429,19 @@ void afficherTableauMots(struct Mot* tableau, int taille) {
         printf("Fréquence : %d\n", tableau[i].frequence);
     }
     printf("\n");
+}
+
+void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMots, int* tailleTableau) {
+    char mot[100];
+    int index = 0;
+
+    rewind(fichier);
+
+    while (fscanf(fichier, "%99s", mot) == 1) {
+        // Convertir le mot en minuscules pour éviter les doublons dus à la casse
+        for (int i = 0; mot[i]; i++) {
+            mot[i] = tolower(mot[i]);
+        }
+        ajouterMotOuIncrementer(mot, tableauMots, nombreMots, tailleTableau);
+    }
 }
