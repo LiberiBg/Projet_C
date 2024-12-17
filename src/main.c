@@ -63,6 +63,7 @@ void on_save_button_clicked(GtkWidget *widget, gpointer data) {
 
 void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     struct AppWidgets *app_widgets = (AppWidgets *)data;
+    effacer_resultats(app_widgets);
 
     GtkWidget *window = gtk_widget_get_toplevel(widget);
     GtkWidget *chooser1 = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "chooser1"));
@@ -154,7 +155,29 @@ void on_compare_button_clicked(GtkWidget *widget, gpointer data) {
         return;
     }
 
-    analyseComparative(chemin1, chemin2);
+    struct ResultatAnalyseComparative resultat = analyseComparative(chemin1, chemin2);
+
+    afficher_resultat(app_widgets, "\nMots les plus fréquents dans le fichier 1 :");
+    for (int i = 0; i < resultat.fichier1.nombreMotsFrequents; i++) {
+        afficher_resultat(app_widgets, "\t%s : %d occurrences", 
+                         resultat.fichier1.motsFrequents[i].mot,
+                         resultat.fichier1.motsFrequents[i].frequence);
+    }
+
+    afficher_resultat(app_widgets, "\nMots les plus fréquents dans le fichier 2 :");
+    for (int i = 0; i < resultat.fichier2.nombreMotsFrequents; i++) {
+        afficher_resultat(app_widgets, "\t%s : %d occurrences",
+                         resultat.fichier2.motsFrequents[i].mot,
+                         resultat.fichier2.motsFrequents[i].frequence);
+    }
+
+    afficher_resultat(app_widgets, "\nMots communs aux deux fichiers: ");
+    for (int i = 0; i < resultat.nombreMotsCommuns; i++) {
+        afficher_resultat(app_widgets, "\t%s : %d occurrences (fichier 1), %d occurrences (fichier 2)",
+                         resultat.motsCommuns[i].mot,
+                         resultat.motsCommuns[i].frequenceFichier1,
+                         resultat.motsCommuns[i].frequenceFichier2);
+    }
 
     g_free(chemin1);
     g_free(chemin2);

@@ -273,10 +273,10 @@ void analyserPhrases(FILE* fichier) {
     float longueurMoyenne = calculerLongueurMoyenne(phrases, nombrePhrases);
     trouverPhrasesExtremes(phrases, nombrePhrases, &plusLongue, &plusCourte);
 
-    printf("Nombre de phrases analysées : %d\n", nombrePhrases);
-    printf("Longueur moyenne des phrases : %.2f\n", longueurMoyenne);
-    printf("Phrase la plus longue (%d caractères) : %s\n", plusLongue.longueur, plusLongue.phrase);
-    printf("Phrase la plus courte (%d caractères) : %s\n", plusCourte.longueur, plusCourte.phrase);
+    // printf("Nombre de phrases analysées : %d\n", nombrePhrases);
+    // printf("Longueur moyenne des phrases : %.2f\n", longueurMoyenne);
+    // printf("Phrase la plus longue (%d caractères) : %s\n", plusLongue.longueur, plusLongue.phrase);
+    // printf("Phrase la plus courte (%d caractères) : %s\n", plusCourte.longueur, plusCourte.phrase);
 }
 
 // Fonction pour comparer deux mots selon leur fréquence
@@ -390,8 +390,6 @@ int estPalindrome(const char* mot) {
     return 1;
 }
 
-
-
 void sauvegarderResultats(const char* cheminSortie, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int nombreMotsDistincts) {
     FILE* fichier = fopen(cheminSortie, "w");
     if (fichier == NULL) {
@@ -419,7 +417,7 @@ void sauvegarderResultats(const char* cheminSortie, int nombreLignes, int nombre
     printf("Les résultats ont été sauvegardés dans le fichier : %s\n", cheminSortie);
 }
 
-void afficherTableauMots(struct Mot* tableau, int taille) {
+void afficherTableauMots(struct Mot* tableau, int taille) { //TODO
     printf("État actuel du tableau de mots :\n");
     for (int i = 0; i < taille; i++) {
        for (int j = 0; j < TAILLE_MAX_MOT; j++) { 
