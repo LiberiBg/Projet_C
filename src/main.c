@@ -63,6 +63,7 @@ void on_save_button_clicked(GtkWidget *widget, gpointer data) {
 
 void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     struct AppWidgets *app_widgets = (AppWidgets *)data;
+    int nombreMotsDistincts = 0;
     effacer_resultats(app_widgets);
 
     GtkWidget *window = gtk_widget_get_toplevel(widget);
@@ -81,7 +82,6 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
         return;
     }
 
-    afficher_resultat(app_widgets, "Fichier lu avec succès!");
     afficher_resultat(app_widgets, "Nombre de lignes : %d", compterLignes(fichier));
     int nombreMots = compterMots(fichier);
     afficher_resultat(app_widgets, "Nombre de mots : %d", nombreMots);
@@ -99,10 +99,10 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
         return;
     }
 
-    int tailleTableau = TAILLE_INITIALE_TABLEAU;
-    mettreAJourFrequence(fichier, &tableauMots, &nombreMots, &tailleTableau);
+    mettreAJourFrequence(fichier, &tableauMots, &nombreMots, &nombreMotsDistincts);
+    afficher_resultat(app_widgets, "Nombre de mots distincts : %d", nombreMotsDistincts);
 
-    struct Mot* tmp = malloc(nombreMots * sizeof(struct Mot));
+    struct Mot* tmp = malloc(nombreMotsDistincts * sizeof(struct Mot));
     if (tmp == NULL) {
         fprintf(stderr, "Erreur : impossible d'allouer la mémoire pour tmp\n");
         free(tableauMots);
@@ -114,7 +114,23 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     fclose(fichier);
     g_free(chemin);
 
-    triFusion(0, nombreMots - 1, tableauMots, tmp);
+    triFusion(0, nombreMotsDistincts -1, tableauMots, tmp);
+
+    if (tableauMots == NULL || nombreMots <= 0) {
+        fprintf(stderr, "Tableau vide ou invalide\n");
+        return;
+    }
+
+    afficher_resultat(app_widgets, "\nListe des mots et fréquences");
+    afficher_resultat(app_widgets, "------------------------------------------------");
+    
+    for (int i = 0; i < nombreMotsDistincts; i++) {
+        afficher_resultat(app_widgets, "%-20s : %d occurrence(s)", 
+               tableauMots[i].mot, 
+               tableauMots[i].frequence);
+    }
+    
+    afficher_resultat(app_widgets, "------------------------------------------------\n");
 
     free(tableauMots);
     free(tmp);
