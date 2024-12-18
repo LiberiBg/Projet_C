@@ -114,7 +114,7 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     fclose(fichier);
     g_free(chemin);
 
-    triFusion(0, nombreMotsDistincts -1, tableauMots, tmp);
+    qsort(tableauMots, nombreMotsDistincts, sizeof(struct Mot), comparerMots);
 
     if (tableauMots == NULL || nombreMots <= 0) {
         fprintf(stderr, "Tableau vide ou invalide\n");

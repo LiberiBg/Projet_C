@@ -15,8 +15,6 @@ FILE* ouvrirFichierLecture(const char* chemin);
 
 void demanderFichier(char* chemin, int taille);
 
-void triFusion(int depart, int nombreMots, struct Mot tab[], struct Mot tmp[]);
-
 int compterLignes(FILE* fichier);
 
 int compterMots(FILE* fichier);
@@ -53,4 +51,7 @@ void sauvegarderResultats(const char* chemin, int nombreLignes, int nombreMots, 
 
 
 void afficherMotsEtFrequences(struct Mot* tableauMots, int nombreMots);
+
+int comparerMots(const void* a, const void* b);
+
 #endif
