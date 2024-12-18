@@ -174,7 +174,7 @@ void on_compare_button_clicked(GtkWidget *widget, gpointer data) {
     fclose(fichier2);
 }
 
-void on_quit_button_clicked(GtkWidget *widget, gpointer data) {
+void on_quit_button_clicked() {
     gtk_main_quit();
 }
 

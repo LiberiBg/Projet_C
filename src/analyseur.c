@@ -223,13 +223,8 @@ void analyserPhrases(FILE* fichier) {
         return;
     }
 
-    float longueurMoyenne = calculerLongueurMoyenne(phrases, nombrePhrases);
     trouverPhrasesExtremes(phrases, nombrePhrases, &plusLongue, &plusCourte);
 
-    // printf("Nombre de phrases analysées : %d\n", nombrePhrases);
-    // printf("Longueur moyenne des phrases : %.2f\n", longueurMoyenne);
-    // printf("Phrase la plus longue (%d caractères) : %s\n", plusLongue.longueur, plusLongue.phrase);
-    // printf("Phrase la plus courte (%d caractères) : %s\n", plusCourte.longueur, plusCourte.phrase);
 }
 
 // Fonction pour comparer deux mots selon leur fréquence
@@ -247,14 +242,12 @@ struct Mot* trouverMot(struct Mot* tableau, int taille, const char* mot) {
     return NULL;
 }
 
-void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMots, int* nombreMotsDistincts) {
+void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMotsDistincts) {
     char mot[100];
-    int index = 0;
 
     rewind(fichier);
 
     while (fscanf(fichier, "%99s", mot) == 1) {
-        // Convertir le mot en minuscules pour éviter les doublons dus à la casse
         for (int i = 0; mot[i]; i++) {
             mot[i] = tolower(mot[i]);
         }
@@ -320,11 +313,11 @@ struct ResultatAnalyseComparative analyseComparative(const char* fichier1, const
         exit(EXIT_FAILURE);
     }
 
-    int nombreMots1 = 0, nombreMots2 = 0, nombreMotsDistincts1 = 0, nombreMotsDistincts2 = 0, nombrePalindromes1 = 0, nombrePalindromes2 = 0;
+    int nombreMotsDistincts1 = 0, nombreMotsDistincts2 = 0;
 
     // Lecture et comptage des mots dans chaque fichier
-    mettreAJourFrequence(f1, &mots1, &nombreMots1, &nombreMotsDistincts1);
-    mettreAJourFrequence(f2, &mots2, &nombreMots2, &nombreMotsDistincts2);
+    mettreAJourFrequence(f1, &mots1, &nombreMotsDistincts1);
+    mettreAJourFrequence(f2, &mots2, &nombreMotsDistincts2);
 
     // Tri des mots par fréquence décroissante
     qsort(mots1, nombreMotsDistincts1, sizeof(struct Mot), comparerMots);
@@ -417,7 +410,7 @@ struct ResultatAnalyseFichier analyserFichier(FILE* fichier) {
     }
 
     // Mise à jour des fréquences
-    mettreAJourFrequence(fichier, &tableauMots, &resultat.nombreMots, &resultat.nombreMotsDistincts);
+    mettreAJourFrequence(fichier, &tableauMots, &resultat.nombreMotsDistincts);
 
     // Tri des mots
     qsort(tableauMots, resultat.nombreMotsDistincts, sizeof(struct Mot), comparerMots);
