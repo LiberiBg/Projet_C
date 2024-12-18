@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <ctype.h>
 
+// Fonction pour ajouter un mot dans un tableau de mots ou incrémenter sa fréquence et mettre à jour le nombre de mots distincts
 void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMotsDistincts) {
     // Parcourt les mots existants dans le tableau
     for (int i = 0; i < *nombreMotsDistincts; i++) {
@@ -22,6 +23,7 @@ void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMot
     (*nombreMotsDistincts)++;
 }
 
+// Fonction pour ouvrir un fichier en mode lecture
 FILE* ouvrirFichierLecture(const char* chemin) {
     printf("Tentative d'ouverture du fichier : %s\n", chemin);
     
@@ -50,15 +52,7 @@ FILE* ouvrirFichierLecture(const char* chemin) {
     return fichier;
 }
 
-void demanderFichier(char* chemin, int taille) {
-    printf("Entrez le chemin du fichier : ");
-    if (fgets(chemin, taille, stdin) == NULL) {
-        printf("Erreur de lecture du chemin\n");
-        exit(1);
-    }
-    chemin[strcspn(chemin, "\n")] = 0; // Supprime le saut de ligne
-}
-
+// Fonction pour compter le nombre de ligne dans le fichier
 int compterLignes(FILE* fichier) {
     int nombreLignes = 0;
     int caractere = 0;
@@ -86,6 +80,7 @@ int compterLignes(FILE* fichier) {
     return nombreLignes;
 }
 
+// Fonction pour compter le nombre de mots dans le fichier
 int compterMots(FILE* fichier) {
 
     int nombreMots = 0;
@@ -116,7 +111,7 @@ int compterMots(FILE* fichier) {
     return nombreMots; // retourner le nombre total de mots
 }
 
-
+// Fonction pour compter le nombre de caractères dans le fichier
 int compterCaracteres(FILE* fichier){
     int nombreCaractere = 0;
     int caractere = 0;
@@ -198,6 +193,7 @@ void analyserPhrases(FILE* fichier) {
         }
     }
 
+    // Traitement de la dernière phrase si elle n'est pas terminée par un point
     if (longueurPhrase > 0 && nombrePhrases < MAX_PHRASES) {
         phrase[longueurPhrase] = '\0';
         phrases[nombrePhrases].longueur = longueurPhrase;
@@ -229,6 +225,7 @@ struct Mot* trouverMot(struct Mot* tableau, int taille, const char* mot) {
     return NULL;
 }
 
+// Fonction pour calculer la fréquence des mots dans un fichier
 void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMotsDistincts) {
     char mot[100];
 
@@ -242,6 +239,7 @@ void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMo
     }
 }
 
+// Fonction pour vérifier si un mot est un palindrome
 int estPalindrome(const char* mot) {
     int debut = 0;
     int fin = strlen(mot) - 1;
@@ -257,6 +255,7 @@ int estPalindrome(const char* mot) {
     return 1;
 }
 
+// Fonction pour analyser deux fichiers
 struct ResultatAnalyseComparative analyseComparative(const char* fichier1, const char* fichier2) {
     struct ResultatAnalyseComparative resultat = {0};  // Initialise tous les champs à zéro
 
@@ -331,6 +330,7 @@ struct ResultatAnalyseComparative analyseComparative(const char* fichier1, const
     return resultat;
 }
 
+// Fonctioner pour sauvegarder un string dans un fichier
 void sauvegarderResultats(const char* cheminSortie, const char* contenu) {
     if (cheminSortie == NULL || contenu == NULL) {
         fprintf(stderr, "Erreur : paramètres invalides pour la sauvegarde\n");
@@ -355,8 +355,9 @@ void sauvegarderResultats(const char* cheminSortie, const char* contenu) {
     printf("Résultats sauvegardés avec succès dans : %s\n", cheminSortie);
 }
 
+// Fonction pour analyser un seul fichier
 struct ResultatAnalyseFichier analyserFichier(FILE* fichier) {
-    struct ResultatAnalyseFichier resultat = {0};  // Initialisation à 0
+    struct ResultatAnalyseFichier resultat = {0};
 
     // Analyse basique du fichier
     resultat.nombreLignes = compterLignes(fichier);
