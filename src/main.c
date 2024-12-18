@@ -174,12 +174,17 @@ void on_compare_button_clicked(GtkWidget *widget, gpointer data) {
     fclose(fichier2);
 }
 
+void on_quit_button_clicked(GtkWidget *widget, gpointer data) {
+    gtk_main_quit();
+}
+
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
     GtkWidget *window, *vbox, *label;
     GtkWidget *chooser1, *chooser2;
     GtkWidget *analyze_button, *compare_button, *save_button;
+    GtkWidget *quit_button = gtk_button_new_with_label("Quitter");
     GtkWidget *scrolled_window;
     AppWidgets *app_widgets;
 
@@ -223,6 +228,7 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(vbox), compare_button, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), save_button, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), quit_button, FALSE, FALSE, 0);
 
     // Connexion des signaux
     g_object_set_data(G_OBJECT(window), "chooser1", chooser1);
@@ -232,6 +238,8 @@ int main(int argc, char *argv[]) {
     g_signal_connect(analyze_button, "clicked", G_CALLBACK(on_analyze_button_clicked), app_widgets);
     g_signal_connect(compare_button, "clicked", G_CALLBACK(on_compare_button_clicked), app_widgets);
     g_signal_connect(save_button, "clicked", G_CALLBACK(on_save_button_clicked), app_widgets);
+    g_signal_connect(G_OBJECT(quit_button), "clicked", G_CALLBACK(on_quit_button_clicked), NULL);
+
 
     // Launch
     gtk_widget_show_all(window);
