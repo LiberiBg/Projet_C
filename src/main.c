@@ -194,6 +194,18 @@ void on_compare_button_clicked(GtkWidget *widget, gpointer data) {
                          resultat.motsCommuns[i].frequenceFichier1,
                          resultat.motsCommuns[i].frequenceFichier2);
     }
+    
+    afficher_resultat(app_widgets, "\nPalindromes communs aux deux fichiers :");
+    for (int i = 0; i < resultat.nombrePalindromesCommuns; i++) {
+        afficher_resultat(app_widgets, "\t%s : %d occurrences (fichier 1), %d occurrences (fichier 2)",
+                        resultat.palindromesCommuns[i].mot,
+                        resultat.palindromesCommuns[i].frequenceFichier1,
+                        resultat.palindromesCommuns[i].frequenceFichier2);
+    }
+
+    if (resultat.nombrePalindromesCommuns == 0) {
+        afficher_resultat(app_widgets, "\tAucun palindrome commun trouvé");
+    }
 
     g_free(chemin1);
     g_free(chemin2);
