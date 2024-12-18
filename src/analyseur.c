@@ -243,18 +243,22 @@ void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMo
 }
 
 int estPalindrome(const char* mot) {
+    if (strlen(mot) < 2) {
+        return 0;
+    }
     int debut = 0;
     int fin = strlen(mot) - 1;
     while (debut < fin) {
         while (debut < fin && !isalpha(mot[debut])) debut++;
         while (debut < fin && !isalpha(mot[fin])) fin--;
         if (tolower(mot[debut]) != tolower(mot[fin])) {
-            return 0;
+            return 0; 
         }
         debut++;
         fin--;
     }
-    return 1;
+    
+    return 1; 
 }
 
 struct ResultatAnalyseComparative analyseComparative(const char* fichier1, const char* fichier2) {
