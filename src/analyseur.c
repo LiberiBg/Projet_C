@@ -6,13 +6,6 @@
 #include <errno.h>
 #include <ctype.h>
 
-#define MAX_NOM_LENGTH 1024
-#define MAX_NOMS_PER_PHRASE 1000
-#define TAILLE_INITIALE_TABLEAU 100
-#define MAX_MOT_LONGUEUR 50
-#define MAX_PHRASE_LENGTH 1000
-#define MAX_PHRASES 1000
-
 void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMotsDistincts) {
     // Parcourt les mots existants dans le tableau
     for (int i = 0; i < *nombreMotsDistincts; i++) {
@@ -144,12 +137,6 @@ int compterCaracteres(FILE* fichier){
     return nombreCaractere;  
 }
 
-// Définition d'une structure pour représenter une phrase
-typedef struct {
-    char phrase[MAX_PHRASE_LENGTH];
-    int longueur; 
-} Phrase;
-
 // Fonction pour détecter les fins de phrase
 int estFinDePhrase(char c) {
     return (c == '.' || c == '!' || c == '?');
@@ -269,30 +256,6 @@ int estPalindrome(const char* mot) {
     }
     return 1;
 }
-
-
-#define MAX_MOTS_FREQUENTS 5
-#define MAX_MOTS_COMMUNS 100
-#define MAX_PALINDROMES 50
-
-struct ResultatAnalyseComparative {
-    struct {
-        struct Mot motsFrequents[MAX_MOTS_FREQUENTS];
-        int nombreMotsFrequents;
-    } fichier1, fichier2;
-    struct {
-        char mot[MAX_MOT_LONGUEUR];
-        int frequenceFichier1;
-        int frequenceFichier2;
-    } motsCommuns[MAX_MOTS_COMMUNS];
-    int nombreMotsCommuns;
-    struct {
-        char mot[MAX_MOT_LONGUEUR];
-        int frequenceFichier1;
-        int frequenceFichier2;
-    } palindromesCommuns[MAX_PALINDROMES];
-    int nombrePalindromesCommuns;
-};
 
 struct ResultatAnalyseComparative analyseComparative(const char* fichier1, const char* fichier2) {
     struct ResultatAnalyseComparative resultat = {0};  // Initialise tous les champs à zéro

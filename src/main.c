@@ -6,15 +6,6 @@
 #include "struct.h"
 #include <ctype.h>
 
-#define TAILLE_INITIALE_TABLEAU 10
-#define MAX_CHEMIN 1024
-
-// Variables globales
-int nombreCaracteres;
-char chemin1[MAX_CHEMIN];
-char chemin2[MAX_CHEMIN];
-
-
 typedef struct AppWidgets {
     GtkWidget *text_view;
     GtkTextBuffer *buffer;
@@ -213,9 +204,7 @@ int main(int argc, char *argv[]) {
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_set_size_request(scrolled_window, -1, 200);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), 
-                                 GTK_POLICY_AUTOMATIC, 
-                                 GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
     // Organisation des widgets
     gtk_container_add(GTK_CONTAINER(window), vbox);
