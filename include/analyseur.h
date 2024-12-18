@@ -47,11 +47,12 @@ struct ResultatAnalyseComparative analyseComparative(const char *fichier1, const
 int estPalindrome(const char* mot);
 
 void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMots, int* tailleTableau);
-void sauvegarderResultats(const char* chemin, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int tailleTableau);
 
+void sauvegarderResultats(const char* cheminSortie, const char* contenu);
 
 void afficherMotsEtFrequences(struct Mot* tableauMots, int nombreMots);
 
 int comparerMots(const void* a, const void* b);
 
+struct ResultatAnalyseFichier analyserFichier(FILE* fichier);
 #endif

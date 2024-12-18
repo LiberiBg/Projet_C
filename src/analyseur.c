@@ -375,30 +375,56 @@ struct ResultatAnalyseComparative analyseComparative(const char* fichier1, const
     return resultat;
 }
 
-void sauvegarderResultats(const char* cheminSortie, int nombreLignes, int nombreMots, int nombreCaracteres, struct Mot* tableauMots, int nombreMotsDistincts) {
-    FILE* fichier = fopen(cheminSortie, "w");
-    if (fichier == NULL) {
-        perror("Erreur lors de l'ouverture du fichier de sortie");
+void sauvegarderResultats(const char* cheminSortie, const char* contenu) {
+    if (cheminSortie == NULL || contenu == NULL) {
+        fprintf(stderr, "Erreur : paramètres invalides pour la sauvegarde\n");
         return;
     }
 
-    // Écrire les résultats dans le fichier
-    fprintf(fichier, "Analyse du fichier :\n");
-    fprintf(fichier, "Nombre de lignes : %d\n", nombreLignes);
-    fprintf(fichier, "Nombre de mots : %d\n", nombreMots);
-    fprintf(fichier, "Nombre de caractères : %d\n", nombreCaracteres);
-    fprintf(fichier, "Nombre de mots distincts : %d\n", nombreMotsDistincts);
-    fprintf(fichier, "\nListe des mots et leur fréquence :\n");
+    FILE* fichier = fopen(cheminSortie, "w");
+    if (fichier == NULL) {
+        fprintf(stderr, "Erreur lors de l'ouverture du fichier %s : %s\n", 
+                cheminSortie, strerror(errno));
+        return;
+    }
 
-    // Trier les mots par fréquence avant de les afficher
-    qsort(tableauMots, nombreMotsDistincts, sizeof(struct Mot), comparerMots);
-
-    // Affichage des mots et leur fréquence
-    for (int i = 0; i < nombreMotsDistincts; i++) {
-        fprintf(fichier, "%s : %d\n", tableauMots[i].mot, tableauMots[i].frequence);
+    // Écriture du contenu
+    if (fputs(contenu, fichier) == EOF) {
+        fprintf(stderr, "Erreur lors de l'écriture dans le fichier %s\n", cheminSortie);
+        fclose(fichier);
+        return;
     }
 
     fclose(fichier);
-    printf("Les résultats ont été sauvegardés dans le fichier : %s\n", cheminSortie);
+    printf("Résultats sauvegardés avec succès dans : %s\n", cheminSortie);
 }
 
+struct ResultatAnalyseFichier analyserFichier(FILE* fichier) {
+    struct ResultatAnalyseFichier resultat = {0};  // Initialisation à 0
+
+    // Analyse basique du fichier
+    resultat.nombreLignes = compterLignes(fichier);
+    resultat.nombreMots = compterMots(fichier);
+    resultat.nombreCaracteres = compterCaracteres(fichier);
+    
+    rewind(fichier);
+    
+    // Allocation et analyse des mots
+    struct Mot* tableauMots = malloc(resultat.nombreMots * sizeof(struct Mot));
+    if (tableauMots == NULL) {
+        fclose(fichier);
+        return resultat;
+    }
+
+    // Mise à jour des fréquences
+    mettreAJourFrequence(fichier, &tableauMots, &resultat.nombreMots, &resultat.nombreMotsDistincts);
+
+    // Tri des mots
+    qsort(tableauMots, resultat.nombreMotsDistincts, sizeof(struct Mot), comparerMots);
+
+    resultat.motsFrequents = tableauMots;
+    resultat.nombreMotsFrequents = resultat.nombreMotsDistincts;
+
+    fclose(fichier);
+    return resultat;
+}

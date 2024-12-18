@@ -8,4 +8,13 @@ struct Mot {
     int frequence;
 };
 
+struct ResultatAnalyseFichier {
+    int nombreLignes;
+    int nombreMots;
+    int nombreCaracteres;
+    int nombreMotsDistincts;
+    struct Mot* motsFrequents;  // Tableau des mots triés par fréquence
+    int nombreMotsFrequents;
+};
+
 #endif

@@ -40,7 +40,6 @@ void afficher_resultat(AppWidgets *widgets, const char *format, ...) {
 void on_save_button_clicked(GtkWidget *widget, gpointer data) {
     struct AppWidgets *app_widgets = (AppWidgets *)data;
     GtkWidget *dialog;
-    GtkFileChooser *chooser;
     
     dialog = gtk_file_chooser_dialog_new("Sauvegarder les résultats",
                                        GTK_WINDOW(gtk_widget_get_toplevel(widget)),
@@ -53,8 +52,15 @@ void on_save_button_clicked(GtkWidget *widget, gpointer data) {
     
     if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
         char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-        printf("Fichier sélectionné : %s\n", filename);
-        // En attente de la récupération des données à sauvegarder
+        
+        // Récupérer le contenu du buffer
+        GtkTextIter start, end;
+        gtk_text_buffer_get_bounds(app_widgets->buffer, &start, &end);
+        char *text = gtk_text_buffer_get_text(app_widgets->buffer, &start, &end, FALSE);
+        
+        sauvegarderResultats(filename, text);
+        
+        g_free(text);
         g_free(filename);
     }
     
@@ -63,77 +69,32 @@ void on_save_button_clicked(GtkWidget *widget, gpointer data) {
 
 void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
     struct AppWidgets *app_widgets = (AppWidgets *)data;
-    int nombreMotsDistincts = 0;
     effacer_resultats(app_widgets);
 
     GtkWidget *window = gtk_widget_get_toplevel(widget);
     GtkWidget *chooser1 = GTK_WIDGET(g_object_get_data(G_OBJECT(window), "chooser1"));
     char *chemin = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser1));
     
-    if (chemin == NULL) {
-        fprintf(stderr, "Erreur : aucun fichier sélectionné\n");
-        return;
+    FILE* fichier = ouvrirFichierLecture(chemin);
+    if (fichier != NULL) {
+        struct ResultatAnalyseFichier resultat = analyserFichier(fichier);
+
+        afficher_resultat(app_widgets, "Nombre de lignes : %d", resultat.nombreLignes);
+        afficher_resultat(app_widgets, "Nombre de mots : %d", resultat.nombreMots);
+        afficher_resultat(app_widgets, "Nombre de caractères : %d", resultat.nombreCaracteres);
+        afficher_resultat(app_widgets, "Nombre de mots distincts : %d", resultat.nombreMotsDistincts);
+
+        afficher_resultat(app_widgets, "\nListe des mots et fréquences");
+        afficher_resultat(app_widgets, "------------------------------------------------");
+        
+        for (int i = 0; i < resultat.nombreMotsDistincts; i++) {
+            afficher_resultat(app_widgets, "%-20s : %d occurrence(s)", 
+                resultat.motsFrequents[i].mot, 
+                resultat.motsFrequents[i].frequence);
+        }
+        
+        afficher_resultat(app_widgets, "------------------------------------------------\n");
     }
-
-    FILE *fichier = ouvrirFichierLecture(chemin);
-    if (fichier == NULL) {
-        fprintf(stderr, "Erreur : impossible d'ouvrir le fichier %s\n", chemin);
-        g_free(chemin);
-        return;
-    }
-
-    afficher_resultat(app_widgets, "Nombre de lignes : %d", compterLignes(fichier));
-    int nombreMots = compterMots(fichier);
-    afficher_resultat(app_widgets, "Nombre de mots : %d", nombreMots);
-    afficher_resultat(app_widgets, "Nombre de caractères : %d", compterCaracteres(fichier));
-
-    rewind(fichier);
-    
-    analyserPhrases(fichier);
-
-    struct Mot* tableauMots = malloc(nombreMots * sizeof(struct Mot));
-    if (tableauMots == NULL) {
-        fprintf(stderr, "Erreur : impossible d'allouer la mémoire pour tableauMots\n");
-        fclose(fichier);
-        g_free(chemin);
-        return;
-    }
-
-    mettreAJourFrequence(fichier, &tableauMots, &nombreMots, &nombreMotsDistincts);
-    afficher_resultat(app_widgets, "Nombre de mots distincts : %d", nombreMotsDistincts);
-
-    struct Mot* tmp = malloc(nombreMotsDistincts * sizeof(struct Mot));
-    if (tmp == NULL) {
-        fprintf(stderr, "Erreur : impossible d'allouer la mémoire pour tmp\n");
-        free(tableauMots);
-        fclose(fichier);
-        g_free(chemin);
-        return;
-    }
-
-    fclose(fichier);
-    g_free(chemin);
-
-    qsort(tableauMots, nombreMotsDistincts, sizeof(struct Mot), comparerMots);
-
-    if (tableauMots == NULL || nombreMots <= 0) {
-        fprintf(stderr, "Tableau vide ou invalide\n");
-        return;
-    }
-
-    afficher_resultat(app_widgets, "\nListe des mots et fréquences");
-    afficher_resultat(app_widgets, "------------------------------------------------");
-    
-    for (int i = 0; i < nombreMotsDistincts; i++) {
-        afficher_resultat(app_widgets, "%-20s : %d occurrence(s)", 
-               tableauMots[i].mot, 
-               tableauMots[i].frequence);
-    }
-    
-    afficher_resultat(app_widgets, "------------------------------------------------\n");
-
-    free(tableauMots);
-    free(tmp);
 }
 
 void on_compare_button_clicked(GtkWidget *widget, gpointer data) {
