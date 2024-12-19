@@ -254,9 +254,11 @@ int estPalindrome(const char* mot) {
     int fin = strlen(mot) - 1;
 
     while (debut < fin && !isalnum((unsigned char)mot[debut])) debut++;
+
     while (debut < fin && !isalnum((unsigned char)mot[fin])) fin--;
 
     if (debut >= fin) return 0;
+
 
     while (debut < fin) {
         while (debut < fin && !isalnum((unsigned char)mot[debut])) debut++;

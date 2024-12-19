@@ -136,43 +136,33 @@ void on_compare_button_clicked(GtkWidget *widget, gpointer data) {
         return;
     }
 
-    // Analyse du premier fichier
-    struct ResultatAnalyseFichier resultat1 = analyserFichier(fichier1);
-    // Analyse du second fichier
-    struct ResultatAnalyseFichier resultat2 = analyserFichier(fichier2);
-
+    int nbrCaracteres1 = compterCaracteres(fichier1);
+    int nbrCaracteres2 = compterCaracteres(fichier2);
+    int nbrLignes1 = compterLignes(fichier1);
+    int nbrLignes2 = compterLignes(fichier2);
+    int nbrMots1 = compterMots(fichier1);
+    int nbrMots2 = compterMots(fichier2);
+    
     // Comparaison du nombre de caractères
-    int difference_caracteres = resultat1.nombreCaracteres - resultat2.nombreCaracteres;
+    int difference_caracteres = nbrCaracteres1 - nbrCaracteres2;
     const char* comparaison = (difference_caracteres >= 0) ? "plus" : "moins";
     difference_caracteres = abs(difference_caracteres);
-
+    
     // Affichage du résultat comparatif
     afficher_resultat(app_widgets, "\nComparaison des fichiers :");
-    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de caractères que le fichier 2.", 
-                    difference_caracteres, comparaison);
-
-    int difference_lignes = resultat1.nombreLignes - resultat2.nombreLignes;
+    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de caractères que le fichier 2.", difference_caracteres, comparaison);
+    
+    int difference_lignes = nbrLignes1 - nbrLignes2;
     const char* comparaison_lignes = (difference_lignes >= 0) ? "plus" : "moins";
     difference_lignes = abs(difference_lignes);
-    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de lignes que le fichier 2.", 
-                    difference_lignes, comparaison_lignes);
+    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de lignes que le fichier 2.", difference_lignes, comparaison_lignes);
     
     // Comparaison du nombre de mots
-    int difference_mots = resultat1.nombreMots - resultat2.nombreMots;
+    int difference_mots = nbrMots1 - nbrMots2;
     const char* comparaison_mots = (difference_mots >= 0) ? "plus" : "moins";
     difference_mots = abs(difference_mots);
-    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de mots que le fichier 2.", 
-                    difference_mots, comparaison_mots);
+    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de mots que le fichier 2.", difference_mots, comparaison_mots);
 
-    // Comparaison du nombre de mots distincts
-    int difference_mots_distincts = resultat1.nombreMotsDistincts - resultat2.nombreMotsDistincts;
-    const char* comparaison_mots_distincts = (difference_mots_distincts >= 0) ? "plus" : "moins";
-    difference_mots_distincts = abs(difference_mots_distincts);
-    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de mots distincts que le fichier 2.", 
-                    difference_mots_distincts, comparaison_mots_distincts);
-
-
-    
 
     struct ResultatAnalyseComparative resultat = analyseComparative(chemin1, chemin2);
 
