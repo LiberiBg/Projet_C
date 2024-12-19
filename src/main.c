@@ -136,6 +136,34 @@ void on_compare_button_clicked(GtkWidget *widget, gpointer data) {
         return;
     }
 
+    int nbrCaracteres1 = compterCaracteres(fichier1);
+    int nbrCaracteres2 = compterCaracteres(fichier2);
+    int nbrLignes1 = compterLignes(fichier1);
+    int nbrLignes2 = compterLignes(fichier2);
+    int nbrMots1 = compterMots(fichier1);
+    int nbrMots2 = compterMots(fichier2);
+    
+    // Comparaison du nombre de caractères
+    int difference_caracteres = nbrCaracteres1 - nbrCaracteres2;
+    const char* comparaison = (difference_caracteres >= 0) ? "plus" : "moins";
+    difference_caracteres = abs(difference_caracteres);
+    
+    // Affichage du résultat comparatif
+    afficher_resultat(app_widgets, "\nComparaison des fichiers :");
+    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de caractères que le fichier 2.", difference_caracteres, comparaison);
+    
+    int difference_lignes = nbrLignes1 - nbrLignes2;
+    const char* comparaison_lignes = (difference_lignes >= 0) ? "plus" : "moins";
+    difference_lignes = abs(difference_lignes);
+    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de lignes que le fichier 2.", difference_lignes, comparaison_lignes);
+    
+    // Comparaison du nombre de mots
+    int difference_mots = nbrMots1 - nbrMots2;
+    const char* comparaison_mots = (difference_mots >= 0) ? "plus" : "moins";
+    difference_mots = abs(difference_mots);
+    afficher_resultat(app_widgets, "Le fichier 1 a %d %s de mots que le fichier 2.", difference_mots, comparaison_mots);
+
+
     struct ResultatAnalyseComparative resultat = analyseComparative(chemin1, chemin2);
 
     afficher_resultat(app_widgets, "\nMots les plus fréquents dans le fichier 1 :");

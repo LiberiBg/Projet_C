@@ -250,24 +250,22 @@ void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMo
 
 int estPalindrome(const char* mot) {
     int debut = 0;
-    int fin = longueur - 1;
+    int fin = strlen(mot) - 1;
 
-    // Ignorer la ponctuation à la fin du mot
-    while (fin > 0 && !isalnum(mot[fin])) {
-        fin--;
-    }
-    // Ignorer la ponctuation au début du mot
-    while (debut < fin && !isalnum(mot[debut])) {
-        debut++;
-    }
+    while (debut < fin && !isalnum((unsigned char)mot[debut])) debut++;
+
+    while (debut < fin && !isalnum((unsigned char)mot[fin])) fin--;
+
+    if (debut >= fin) return 0;
+
 
     while (debut < fin) {
-        // Ignorer les caractères non alphanumériques au début
-        while (debut < fin && !isalnum(mot[debut])) debut++;
-        // Ignorer les caractères non alphanumériques à la fin
-        while (debut < fin && !isalnum(mot[fin])) fin--;
-        if (tolower(mot[debut]) != tolower(mot[fin])) {
-            return 0;
+        while (debut < fin && !isalnum((unsigned char)mot[debut])) debut++;
+        while (debut < fin && !isalnum((unsigned char)mot[fin])) fin--;
+
+        // Comparer les caractères correspondants
+        if (tolower((unsigned char)mot[debut]) != tolower((unsigned char)mot[fin])) {
+            return 0; // Ce n'est pas un palindrome
         }
         
         debut++;
