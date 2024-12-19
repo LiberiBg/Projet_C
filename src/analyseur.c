@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <ctype.h>
+#include <locale.h> 
 
 // Fonction pour ajouter un mot dans un tableau de mots ou incrémenter sa fréquence et mettre à jour le nombre de mots distincts
 void ajouterMotOuIncrementer(char* mot, struct Mot** tableauMots, int* nombreMotsDistincts) {
@@ -228,14 +229,22 @@ struct Mot* trouverMot(struct Mot* tableau, int taille, const char* mot) {
 // Fonction pour calculer la fréquence des mots dans un fichier
 void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMotsDistincts) {
     char mot[100];
+    char motFiltre[100];
+    int j;
 
     rewind(fichier);
 
     while (fscanf(fichier, "%99s", mot) == 1) {
+        j = 0;
         for (int i = 0; mot[i]; i++) {
-            mot[i] = tolower(mot[i]);
+            if (isalpha(mot[i]) || mot[i] == '\'' || mot[i] == '-') {
+                motFiltre[j++] = tolower(mot[i]);
+            }
         }
-        ajouterMotOuIncrementer(mot, tableauMots, nombreMotsDistincts);
+        motFiltre[j] = '\0'; // Terminer la chaîne filtrée
+        if (j > 0) { // Ajouter seulement si le mot filtré n'est pas vide
+            ajouterMotOuIncrementer(motFiltre, tableauMots, nombreMotsDistincts);
+        }
     }
 }
 
@@ -247,6 +256,11 @@ int estPalindrome(const char* mot) {
     while (fin > 0 && !isalnum(mot[fin])) {
         fin--;
     }
+    // Ignorer la ponctuation au début du mot
+    while (debut < fin && !isalnum(mot[debut])) {
+        debut++;
+    }
+
     while (debut < fin) {
         // Ignorer les caractères non alphanumériques au début
         while (debut < fin && !isalnum(mot[debut])) debut++;

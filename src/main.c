@@ -5,6 +5,7 @@
 #include "analyseur.h"
 #include "struct.h"
 #include <ctype.h>
+#include <locale.h> 
 
 typedef struct AppWidgets {
     GtkWidget *text_view;
@@ -182,6 +183,7 @@ void on_quit_button_clicked() {
 }
 
 int main(int argc, char *argv[]) {
+    setlocale(LC_ALL, "fr_FR.UTF-8");
     gtk_init(&argc, &argv);
 
     GtkWidget *window, *vbox, *label;
