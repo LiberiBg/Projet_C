@@ -248,6 +248,7 @@ void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMo
     }
 }
 
+// Fonction qui vérifie si un mot est un palindrome
 int estPalindrome(const char* mot) {
     int debut = 0;
     int fin = strlen(mot) - 1;
@@ -267,13 +268,14 @@ int estPalindrome(const char* mot) {
         if (tolower((unsigned char)mot[debut]) != tolower((unsigned char)mot[fin])) {
             return 0; // Ce n'est pas un palindrome
         }
-        
+
         debut++;
         fin--;
     }
-    
-    return 1; 
+
+    return 1; // C'est un palindrome
 }
+
 
 // Fonction pour analyser deux fichiers
 struct ResultatAnalyseComparative analyseComparative(const char* fichier1, const char* fichier2) {
