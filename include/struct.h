@@ -2,7 +2,7 @@
 #define STRUCT_H
 
 #define TAILLE_MAX_MOT 100
-#define MAX_MOTS_FREQUENTS 100
+#define MAX_MOTS_FREQUENTS 5
 #define MAX_MOT_LONGUEUR 50
 #define MAX_MOTS_COMMUNS 100
 #define MAX_PALINDROMES 100
@@ -29,6 +29,7 @@ struct ResultatAnalyseFichier {
     int nombreMotsDistincts;
     struct Mot* motsFrequents;  // Tableau des mots triés par fréquence
     int nombreMotsFrequents;
+    int nombrePalindromes;
 };
 
 struct ResultatAnalyseComparative {
