@@ -77,7 +77,7 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
 
         afficher_resultat(app_widgets, "\nListe des mots et fréquences");
         afficher_resultat(app_widgets, "------------------------------------------------");
-        
+
         for (int i = 0; i < resultat.nombreMotsDistincts; i++) {
             afficher_resultat(app_widgets, "%-20s : %d occurrence(s)", 
                 resultat.motsFrequents[i].mot, 
@@ -85,6 +85,18 @@ void on_analyze_button_clicked(GtkWidget *widget, gpointer data) {
         }
         
         afficher_resultat(app_widgets, "------------------------------------------------\n");
+
+        afficher_resultat(app_widgets, "Palindromes présents : %d", resultat.nombrePalindromes);
+        afficher_resultat(app_widgets, "------------------------------------------------\n");
+
+        for (int i = 0; i < resultat.nombreMotsDistincts; i++) {
+            if (estPalindrome(resultat.motsFrequents[i].mot)) {
+                afficher_resultat(app_widgets, "\t%s : %d occurrences",
+                                resultat.motsFrequents[i].mot,
+                                resultat.motsFrequents[i].frequence);
+            }
+        }
+
     }
 }
 

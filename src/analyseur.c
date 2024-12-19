@@ -239,20 +239,32 @@ void mettreAJourFrequence(FILE* fichier, struct Mot** tableauMots, int* nombreMo
     }
 }
 
-// Fonction pour vérifier si un mot est un palindrome
 int estPalindrome(const char* mot) {
+    int longueur = strlen(mot);
+    if (longueur < 2) {
+        return 0; // Ne pas considérer les caractères uniques comme des palindromes
+    }
     int debut = 0;
-    int fin = strlen(mot) - 1;
+    int fin = longueur - 1;
+
+    // Ignorer la ponctuation à la fin du mot
+    while (fin > 0 && !isalnum(mot[fin])) {
+        fin--;
+    }
     while (debut < fin) {
-        while (debut < fin && !isalpha(mot[debut])) debut++;
-        while (debut < fin && !isalpha(mot[fin])) fin--;
+        // Ignorer les caractères non alphanumériques au début
+        while (debut < fin && !isalnum(mot[debut])) debut++;
+        // Ignorer les caractères non alphanumériques à la fin
+        while (debut < fin && !isalnum(mot[fin])) fin--;
         if (tolower(mot[debut]) != tolower(mot[fin])) {
-            return 0;
+            return 0; // Ce n'est pas un palindrome
         }
+        
         debut++;
         fin--;
     }
-    return 1;
+    
+    return 1; 
 }
 
 // Fonction pour analyser deux fichiers
@@ -381,6 +393,15 @@ struct ResultatAnalyseFichier analyserFichier(FILE* fichier) {
 
     resultat.motsFrequents = tableauMots;
     resultat.nombreMotsFrequents = resultat.nombreMotsDistincts;
+
+    // Fonction Palindrome
+    int nombrePalindromes = 0;
+    for (int i = 0; i < resultat.nombreMotsDistincts; i++) {
+        if (estPalindrome(tableauMots[i].mot)) {
+            nombrePalindromes++;
+        }
+    }
+    resultat.nombrePalindromes = nombrePalindromes;
 
     fclose(fichier);
     return resultat;

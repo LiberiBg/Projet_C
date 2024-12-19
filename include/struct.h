@@ -29,6 +29,7 @@ struct ResultatAnalyseFichier {
     int nombreMotsDistincts;
     struct Mot* motsFrequents;  // Tableau des mots triés par fréquence
     int nombreMotsFrequents;
+    int nombrePalindromes;
 };
 
 struct ResultatAnalyseComparative {
